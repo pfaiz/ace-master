@@ -114,7 +114,7 @@
             background: #c0392b;
         }
 
-        .home-btn {
+        .home-btn, .refill-btn {
             background: #3498db;
             color: white;
             border: none;
@@ -125,7 +125,7 @@
             cursor: pointer;
         }
 
-        .home-btn:hover {
+        .home-btn:hover, .refill-btn:hover {
             background: #2980b9;
         }
     </style>
@@ -156,6 +156,7 @@
         <p id="balance">Balance: $1000</p>
     </div>
 
+    <button class="refill-btn" onclick="refillBalance()">Refill Balance</button>
     <button class="home-btn" onclick="goHome()">Home</button>
 
     <script>
@@ -280,14 +281,6 @@
                     ? "It's a tie!"
                     : `Dealer wins! You lose $${currentBet}.`;
 
-            balance += playerTotal > dealerTotal ? currentBet : -currentBet;
-            document.getElementById("status").innerText = result;
-            document.getElementById("balance").innerText = `Balance: $${balance}`;
-        };
-
-        const goHome = () => {
-            window.location.reload();
-        };
-    </script>
-</body>
-</html>
+            if (result.includes("win")) {
+                balance += currentBet;
+            } else
