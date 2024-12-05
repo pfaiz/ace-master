@@ -279,4 +279,16 @@
                 `Dealer wins! You lose $${currentBet}.`;
 
             document.getElementById("status").innerText = result;
-            balance += playerTotal > dealer
+            balance += playerTotal > dealerTotal ? currentBet : -currentBet;
+            document.getElementById("balance").innerText = `Balance: $${balance}`;
+        };
+
+        const revealDealerCards = () => {
+            while (dealerTotal < 17) {
+                hitDealer();
+                dealerTotal = calculateTotal(dealerCards);
+            }
+        };
+    </script>
+</body>
+</html>
