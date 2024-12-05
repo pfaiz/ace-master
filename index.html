@@ -34,10 +34,11 @@
             width: 90%;
             height: 500px;
             border-radius: 20px;
-            border: 15px solid #b5651d;
+            border: 15px solid #8b4513; /* Default brown color */
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
             position: relative;
             margin-top: 20px;
+            background-color: #5e3d26;
         }
 
         .table .text {
@@ -62,9 +63,9 @@
             cursor: pointer;
         }
 
-        .green { background: green; }
-        .blue { background: blue; }
-        .red { background: red; }
+        .brown { background: #5e3d26; } /* Dark Brown */
+        .dark-blue { background: #2c3b50; } /* Dark Blue */
+        .dark-red { background: #8b0000; } /* Dark Red */
 
         .dealer-area, .player-area {
             display: flex;
@@ -130,6 +131,21 @@
         .control-btn:hover {
             background: #c0392b;
         }
+
+        .home-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 18px;
+            border-radius: 5px;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+
+        .home-btn:hover {
+            background: #2980b9;
+        }
     </style>
 </head>
 <body>
@@ -141,9 +157,9 @@
         <div class="text">Blackjack Pays 3 to 2 • Dealer Must Stand on 17</div>
 
         <div class="table-color-buttons">
-            <div class="table-color-button green" onclick="changeTableColor('green')"></div>
-            <div class="table-color-button blue" onclick="changeTableColor('blue')"></div>
-            <div class="table-color-button red" onclick="changeTableColor('red')"></div>
+            <div class="table-color-button brown" onclick="changeTableColor('brown')"></div>
+            <div class="table-color-button dark-blue" onclick="changeTableColor('#2c3b50')"></div>
+            <div class="table-color-button dark-red" onclick="changeTableColor('#8b0000')"></div>
         </div>
 
         <div class="dealer-area" id="dealer-cards"></div>
@@ -163,6 +179,8 @@
         <p id="status"></p>
         <p id="balance">Balance: $1000</p>
     </div>
+
+    <button class="home-btn" onclick="goHome()">Home</button>
 
     <script>
         let playerCards = [];
@@ -231,6 +249,7 @@
         const hitDealer = () => {
             const card = drawCard();
             dealerCards.push(card);
+            dealerTotal = calculateTotal(dealerCards);
             updateCards("dealer-cards", dealerCards);
         };
 
@@ -288,6 +307,10 @@
                 hitDealer();
                 dealerTotal = calculateTotal(dealerCards);
             }
+        };
+
+        const goHome = () => {
+            window.location.reload();
         };
     </script>
 </body>
