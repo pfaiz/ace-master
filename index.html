@@ -55,7 +55,7 @@
         }
 
         .player-area {
-            margin-top: 50px; /* Move player cards lower */
+            margin-top: 100px; /* Move player cards lower */
         }
 
         .player-area-label {
@@ -332,7 +332,7 @@
                     : `Dealer wins! You lost $${currentBet}.`;
 
             if (result.includes("win")) {
-                balance += currentBet * 2; // Standard win multiplier
+                balance += currentBet * 2; // Add winnings for a win
             }
 
             showPopup(result);
