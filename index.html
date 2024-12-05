@@ -142,12 +142,13 @@
     </div>
 
     <div class="chips-area">
-        <span class="chip" onclick="placeBet(100)">$100</span>
-        <span class="chip" onclick="placeBet(200)">$200</span>
-        <span class="chip" onclick="placeBet(300)">$300</span>
+        <span class="chip" onclick="setBet(100)">$100</span>
+        <span class="chip" onclick="setBet(200)">$200</span>
+        <span class="chip" onclick="setBet(300)">$300</span>
     </div>
 
     <div class="controls">
+        <button class="control-btn" id="place-bet-btn" onclick="placeBet()" disabled>Place Bet</button>
         <button class="control-btn" id="hit-btn" onclick="hit()" disabled>Hit</button>
         <button class="control-btn" id="stand-btn" onclick="stand()" disabled>Stand</button>
         <p id="status"></p>
@@ -164,15 +165,24 @@
         let balance = 1000;
         let currentBet = 0;
 
-        const placeBet = (amount) => {
+        const setBet = (amount) => {
             if (amount > balance) {
                 alert("Not enough balance!");
                 return;
             }
             currentBet = amount;
+            document.getElementById("place-bet-btn").disabled = false;
+        };
+
+        const placeBet = () => {
+            if (currentBet > balance) {
+                alert("Not enough balance to place this bet!");
+                return;
+            }
             balance -= currentBet;
             document.getElementById("balance").innerText = `Balance: $${balance}`;
             startHand();
+            document.getElementById("place-bet-btn").disabled = true;
         };
 
         const startHand = () => {
@@ -278,7 +288,7 @@
                     : `Dealer wins! You lose $${currentBet}.`;
 
             if (result.includes("win")) {
-                balance += currentBet * 2; // Win adds double the bet
+                balance += currentBet * 2; // Player wins double the bet amount
             }
 
             document.getElementById("status").innerText = result;
@@ -286,7 +296,7 @@
         };
 
         const refillBalance = () => {
-            balance += 1000;
+            balance = 1000;
             document.getElementById("balance").innerText = `Balance: $${balance}`;
         };
     </script>
