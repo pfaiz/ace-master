@@ -226,10 +226,14 @@
 
         const stand = () => {
             revealDealerCards();
+
+            // Dealer draws cards until the total is at least 17
             while (dealerTotal < 17) {
                 dealerCards.push(drawCard());
                 dealerTotal = calculateTotal(dealerCards);
             }
+
+            // Dealer stands on 17 or higher
             endGame();
         };
 
