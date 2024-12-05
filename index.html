@@ -34,11 +34,11 @@
             width: 90%;
             height: 500px;
             border-radius: 20px;
-            border: 15px solid #8b4513; /* Default brown color */
+            border: 15px solid #8b4513; /* Default brown outline */
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
             position: relative;
             margin-top: 20px;
-            background-color: #5e3d26;
+            background-color: #5e3d26; /* Default brown base */
         }
 
         .table .text {
@@ -113,7 +113,7 @@
             background: #c0392b;
         }
 
-        .refill-btn {
+        .refill-btn, .color-btn {
             background: #3498db;
             color: white;
             border: none;
@@ -124,7 +124,7 @@
             cursor: pointer;
         }
 
-        .refill-btn:hover {
+        .refill-btn:hover, .color-btn:hover {
             background: #2980b9;
         }
     </style>
@@ -153,6 +153,12 @@
         <button class="control-btn" id="stand-btn" onclick="stand()" disabled>Stand</button>
         <p id="status"></p>
         <p id="balance">Balance: $1000</p>
+    </div>
+
+    <div class="controls">
+        <button class="color-btn" onclick="changeTableColor('#5e3d26', '#8b4513')">Default Brown</button>
+        <button class="color-btn" onclick="changeTableColor('#1c2833', '#34495e')">Cool Blue</button>
+        <button class="color-btn" onclick="changeTableColor('#641e16', '#922b21')">Bold Red</button>
     </div>
 
     <button class="refill-btn" onclick="refillBalance()">Refill Balance</button>
@@ -286,13 +292,13 @@
                 playerTotal > 21
                     ? `Bust! You lose $${currentBet}.`
                     : dealerTotal > 21 || playerTotal > dealerTotal
-                    ? `You win $${currentBet}!`
+                    ? `You win $${currentBet * 1.5}!`
                     : playerTotal === dealerTotal
                     ? "It's a tie!"
                     : `Dealer wins! You lose $${currentBet}.`;
 
             if (result.includes("win")) {
-                balance += currentBet * 2; // Player wins double the bet amount
+                balance += currentBet * 2.5; // Blackjack win multiplier
             }
 
             document.getElementById("status").innerText = result;
@@ -302,6 +308,12 @@
         const refillBalance = () => {
             balance = 1000;
             document.getElementById("balance").innerText = `Balance: $${balance}`;
+        };
+
+        const changeTableColor = (baseColor, borderColor) => {
+            const table = document.getElementById("table");
+            table.style.backgroundColor = baseColor;
+            table.style.borderColor = borderColor;
         };
     </script>
 </body>
