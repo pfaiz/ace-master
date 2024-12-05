@@ -54,6 +54,17 @@
             margin: 20px;
         }
 
+        .player-area {
+            margin-top: 50px; /* Move player cards lower */
+        }
+
+        .player-area-label {
+            color: white;
+            text-align: center;
+            font-size: 18px;
+            margin-top: 10px;
+        }
+
         .card {
             display: inline-block;
             width: 60px;
@@ -128,7 +139,6 @@
             background: #2980b9;
         }
 
-        /* Pop-up message styles */
         .popup {
             position: fixed;
             top: 50%;
@@ -163,6 +173,7 @@
 
         <div class="dealer-area" id="dealer-cards"></div>
         <div class="player-area" id="player-cards"></div>
+        <div class="player-area-label">Your Hand</div>
     </div>
 
     <div class="chips-area">
@@ -257,13 +268,12 @@
         const stand = () => {
             revealDealerCards();
 
-            // Dealer draws cards until the total is at least 17
+            // Dealer draws cards until the total is at least 17 and not above 21
             while (dealerTotal < 17) {
                 dealerCards.push(drawCard());
                 dealerTotal = calculateTotal(dealerCards);
             }
 
-            // Dealer stands on 17 or higher
             endGame();
         };
 
