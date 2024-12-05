@@ -143,11 +143,10 @@
 
     <div class="chips-area">
         <span class="chip" onclick="setBet(100)">$100</span>
-        <span class="chip" onclick="setBet(200)">$200</span>
-        <span class="chip" onclick="setBet(300)">$300</span>
     </div>
 
     <div class="controls">
+        <p id="current-bet">Current Bet: $0</p>
         <button class="control-btn" id="place-bet-btn" onclick="placeBet()" disabled>Place Bet</button>
         <button class="control-btn" id="hit-btn" onclick="hit()" disabled>Hit</button>
         <button class="control-btn" id="stand-btn" onclick="stand()" disabled>Stand</button>
@@ -172,11 +171,12 @@
         let currentBet = 0;
 
         const setBet = (amount) => {
-            if (amount > balance) {
+            if (currentBet + amount > balance) {
                 alert("Not enough balance!");
                 return;
             }
-            currentBet = amount;
+            currentBet += amount;
+            document.getElementById("current-bet").innerText = `Current Bet: $${currentBet}`;
             document.getElementById("place-bet-btn").disabled = false;
         };
 
@@ -292,17 +292,19 @@
                 playerTotal > 21
                     ? `Bust! You lose $${currentBet}.`
                     : dealerTotal > 21 || playerTotal > dealerTotal
-                    ? `You win $${currentBet * 1.5}!`
+                    ? `You win $${currentBet}!`
                     : playerTotal === dealerTotal
                     ? "It's a tie!"
                     : `Dealer wins! You lose $${currentBet}.`;
 
             if (result.includes("win")) {
-                balance += currentBet * 2.5; // Blackjack win multiplier
+                balance += currentBet * 2; // Standard win multiplier
             }
 
             document.getElementById("status").innerText = result;
             document.getElementById("balance").innerText = `Balance: $${balance}`;
+            currentBet = 0;
+            document.getElementById("current-bet").innerText = `Current Bet: $0`;
         };
 
         const refillBalance = () => {
