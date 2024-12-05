@@ -31,7 +31,6 @@
         }
 
         .table {
-            background: green;
             width: 90%;
             height: 500px;
             border-radius: 20px;
@@ -48,31 +47,24 @@
             margin-top: 10px;
         }
 
-        .chip {
-            display: inline-block;
-            width: 50px;
-            height: 50px;
+        .table-color-buttons {
+            display: flex;
+            justify-content: center;
+            margin: 10px 0;
+        }
+
+        .table-color-button {
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
-            margin: 10px;
-            background-color: gold;
-            color: black;
-            line-height: 50px;
-            font-size: 16px;
-            text-align: center;
-            border: 2px solid black;
+            margin: 5px;
+            border: 2px solid white;
             cursor: pointer;
         }
 
-        .chip:hover {
-            background-color: orange;
-        }
-
-        .bet-area {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-top: 20px;
-        }
+        .green { background: green; }
+        .blue { background: blue; }
+        .red { background: red; }
 
         .dealer-area, .player-area {
             display: flex;
@@ -94,9 +86,34 @@
             font-size: 18px;
         }
 
+        .chips-area {
+            display: flex;
+            justify-content: center;
+            margin: 10px;
+        }
+
+        .chip {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin: 10px;
+            background-color: gold;
+            color: black;
+            line-height: 50px;
+            font-size: 16px;
+            text-align: center;
+            border: 2px solid black;
+            cursor: pointer;
+        }
+
+        .chip:hover {
+            background-color: orange;
+        }
+
         .controls {
             text-align: center;
-            margin-top: 20px;
+            margin-top: 10px;
         }
 
         .control-btn {
@@ -120,38 +137,44 @@
         <h1>Blackjack</h1>
     </header>
 
-    <div class="table">
+    <div class="table" id="table">
         <div class="text">Blackjack Pays 3 to 2 • Dealer Must Stand on 17</div>
-        <div id="bet-area" class="bet-area">
-            <span class="chip" onclick="placeBet(100)">$100</span>
-            <span class="chip" onclick="placeBet(200)">$200</span>
-            <span class="chip" onclick="placeBet(300)">$300</span>
-        </div>
-        <p id="current-bet">Current Bet: $0</p>
-        <button id="start-btn" class="control-btn" onclick="startHand()" disabled>Place Bet</button>
 
-        <div class="dealer-area" id="dealer-cards">
-            <div class="card">K</div>
-            <div class="card" id="hidden-card">?</div>
+        <div class="table-color-buttons">
+            <div class="table-color-button green" onclick="changeTableColor('green')"></div>
+            <div class="table-color-button blue" onclick="changeTableColor('blue')"></div>
+            <div class="table-color-button red" onclick="changeTableColor('red')"></div>
         </div>
 
+        <div class="dealer-area" id="dealer-cards"></div>
         <div class="player-area" id="player-cards"></div>
     </div>
 
+    <div class="chips-area">
+        <span class="chip" onclick="placeBet(100)">$100</span>
+        <span class="chip" onclick="placeBet(200)">$200</span>
+        <span class="chip" onclick="placeBet(300)">$300</span>
+    </div>
+
     <div class="controls">
-        <button class="control-btn" onclick="hit()">Hit</button>
-        <button class="control-btn" onclick="stand()">Stand</button>
+        <button class="control-btn" id="bet-btn" onclick="startHand()" disabled>Place Bet</button>
+        <button class="control-btn" onclick="hit()" id="hit-btn" disabled>Hit</button>
+        <button class="control-btn" onclick="stand()" id="stand-btn" disabled>Stand</button>
         <p id="status"></p>
         <p id="balance">Balance: $1000</p>
     </div>
 
     <script>
         let playerCards = [];
-        let dealerCards = ["K", "?"];
+        let dealerCards = [];
         let playerTotal = 0;
         let dealerTotal = 0;
         let balance = 1000;
         let currentBet = 0;
+
+        const changeTableColor = (color) => {
+            document.getElementById("table").style.background = color;
+        };
 
         const placeBet = (amount) => {
             if (currentBet + amount > balance) {
@@ -159,70 +182,101 @@
                 return;
             }
             currentBet += amount;
-            document.getElementById("current-bet").innerText = `Current Bet: $${currentBet}`;
-            document.getElementById("start-btn").disabled = false;
+            document.getElementById("bet-btn").disabled = false;
         };
 
         const startHand = () => {
-            document.getElementById("start-btn").disabled = true;
+            document.getElementById("bet-btn").disabled = true;
             resetGame();
+            dealInitialCards();
         };
 
         const resetGame = () => {
             playerCards = [];
-            dealerCards = ["K", "?"];
+            dealerCards = [];
             playerTotal = 0;
             dealerTotal = 0;
+            currentBet = 0;
             document.getElementById("player-cards").innerHTML = "";
             document.getElementById("dealer-cards").innerHTML = `
-                <div class="card">K</div>
-                <div class="card" id="hidden-card">?</div>
+                <div class="card">?</div>
+                <div class="card">?</div>
             `;
             document.getElementById("status").innerText = "";
+            document.getElementById("hit-btn").disabled = false;
+            document.getElementById("stand-btn").disabled = false;
         };
 
-        const hit = () => {
-            const newCard = Math.floor(Math.random() * 10) + 1;
-            playerCards.push(newCard);
-            updatePlayerCards();
+        const dealInitialCards = () => {
+            setTimeout(() => {
+                hitPlayer();
+            }, 500);
+            setTimeout(() => {
+                hitPlayer();
+                hitDealer();
+            }, 1000);
+        };
 
-            if (playerTotal === 21) {
-                document.getElementById("status").innerText = "Blackjack! Revealing dealer's card.";
-                revealDealerCard();
-            } else if (playerTotal > 21) {
-                document.getElementById("status").innerText = "Bust! You lose.";
-                balance -= currentBet;
-                updateBalance();
+        const hitPlayer = () => {
+            const card = drawCard();
+            playerCards.push(card);
+            playerTotal = calculateTotal(playerCards);
+            updateCards("player-cards", playerCards);
+
+            if (playerTotal >= 21) {
+                endGame();
             }
         };
 
-        const stand = () => {
-            revealDealerCard();
+        const hitDealer = () => {
+            const card = drawCard();
+            dealerCards.push(card);
+            updateCards("dealer-cards", dealerCards);
         };
 
-        const revealDealerCard = () => {
-            document.getElementById("hidden-card").innerText = "5"; // Example card
-            dealerTotal = 15; // Example total
-            document.getElementById("status").innerText =
-                dealerTotal > 21 || playerTotal > dealerTotal
-                    ? `You win $${currentBet}!`
-                    : `Dealer wins! You lose $${currentBet}.`;
-
-            balance += playerTotal > dealerTotal ? currentBet : -currentBet;
-            updateBalance();
+        const drawCard = () => {
+            const cardValues = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
+            return cardValues[Math.floor(Math.random() * cardValues.length)];
         };
 
-        const updatePlayerCards = () => {
-            playerTotal = playerCards.reduce((a, b) => a + b, 0);
-            const cards = playerCards.map(card => `<div class="card">${card}</div>`).join("");
-            document.getElementById("player-cards").innerHTML = cards;
+        const calculateTotal = (cards) => {
+            let total = 0;
+            let aces = 0;
+
+            for (let card of cards) {
+                if (card === "A") {
+                    total += 11;
+                    aces++;
+                } else if (["J", "Q", "K"].includes(card)) {
+                    total += 10;
+                } else {
+                    total += parseInt(card);
+                }
+            }
+
+            while (total > 21 && aces > 0) {
+                total -= 10;
+                aces--;
+            }
+
+            return total;
         };
 
-        const updateBalance = () => {
-            document.getElementById("balance").innerText = `Balance: $${balance}`;
-            currentBet = 0;
-            document.getElementById("current-bet").innerText = "Current Bet: $0";
+        const updateCards = (areaId, cards) => {
+            const area = document.getElementById(areaId);
+            area.innerHTML = cards.map(card => `<div class="card">${card}</div>`).join("");
         };
-    </script>
-</body>
-</html>
+
+        const endGame = () => {
+            document.getElementById("hit-btn").disabled = true;
+            document.getElementById("stand-btn").disabled = true;
+            revealDealerCards();
+
+            const result =
+                playerTotal > 21 ? "Bust! You lose." :
+                dealerTotal > 21 || playerTotal > dealerTotal ? `You win $${currentBet}!` :
+                playerTotal === dealerTotal ? "It's a tie!" :
+                `Dealer wins! You lose $${currentBet}.`;
+
+            document.getElementById("status").innerText = result;
+            balance += playerTotal > dealer
