@@ -58,7 +58,7 @@
         }
 
         .card {
-            position: absolute;
+            display: inline-block;
             width: 60px;
             height: 90px;
             border-radius: 8px;
@@ -69,18 +69,21 @@
             text-align: center;
             line-height: 90px;
             font-size: 18px;
-            transition: all 0.5s ease;
+            position: relative;
             opacity: 0;
+            transform: scale(0.8);
+            animation: deal-animation 0.5s ease forwards;
         }
 
-        .fly-to-player {
-            transform: translate(0, 200px);
-            opacity: 1;
-        }
-
-        .fly-to-dealer {
-            transform: translate(0, -200px);
-            opacity: 1;
+        @keyframes deal-animation {
+            0% {
+                transform: translate(-50%, -50%) scale(0.5);
+                opacity: 0;
+            }
+            100% {
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
+            }
         }
 
         .chips-area {
@@ -222,23 +225,24 @@
         };
 
         const dealInitialCards = () => {
-            dealCard("dealer-cards", "fly-to-dealer");
-            dealCard("dealer-cards", "fly-to-dealer");
-            dealCard("player-cards", "fly-to-player");
-            dealCard("player-cards", "fly-to-player");
+            dealCard("dealer-cards", "?", "dealer");
+            dealCard("dealer-cards", "?", "dealer");
+            dealCard("player-cards", "?", "player");
+            dealCard("player-cards", "?", "player");
         };
 
-        const dealCard = (areaId, animationClass) => {
+        const dealCard = (areaId, cardValue, recipient) => {
             const area = document.getElementById(areaId);
             const card = document.createElement("div");
-            card.classList.add("card", animationClass);
-            card.innerText = "?";
+            card.classList.add("card");
+            card.innerText = cardValue;
             area.appendChild(card);
 
+            // Delay animation to simulate dealing sequence
             setTimeout(() => {
-                card.style.transform = "translate(0, 0)";
                 card.style.opacity = "1";
-            }, 100);
+                card.style.transform = "scale(1)";
+            }, 500);
         };
 
         const refillBalance = () => {
