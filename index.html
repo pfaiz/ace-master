@@ -34,11 +34,11 @@
             width: 90%;
             height: 500px;
             border-radius: 20px;
-            border: 15px solid #8b4513; /* Default: Brown */
+            border: 15px solid #8b4513;
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
             position: relative;
             margin-top: 20px;
-            background-color: #5e3d26; /* Default: Brown */
+            background-color: #5e3d26;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -143,13 +143,11 @@
             background: #3498db;
             color: white;
             border: none;
-            padding: 10px 30px;
-            font-size: 16px;
+            padding: 10px 20px;
+            font-size: 18px;
             border-radius: 5px;
-            margin: 5px;
-            text-transform: uppercase;
+            margin-top: 10px;
             cursor: pointer;
-            box-shadow: 0 4px rgba(0, 0, 0, 0.3);
         }
 
         .color-btn:hover {
@@ -281,14 +279,12 @@
 
         const hit = () => {
             const cardSound = document.getElementById("card-sound");
-            cardSound.currentTime = 0; 
+            cardSound.currentTime = 0;
             cardSound.play();
-
             playerCards.push(drawCard());
             playerTotal = calculateTotal(playerCards);
             updateCards("player-cards", playerCards);
             document.getElementById("player-value").innerText = `Your Hand: ${playerTotal}`;
-
             if (playerTotal >= 21) {
                 endGame();
             }
@@ -296,12 +292,10 @@
 
         const stand = () => {
             revealDealerCards();
-
             while (dealerTotal < 17) {
                 dealerCards.push(drawCard());
                 dealerTotal = calculateTotal(dealerCards);
             }
-
             document.getElementById("dealer-value").innerText = `Dealer's Hand: ${dealerTotal}`;
             endGame();
         };
@@ -314,7 +308,6 @@
         const calculateTotal = (cards) => {
             let total = 0;
             let aces = 0;
-
             for (let card of cards) {
                 if (card === "A") {
                     total += 11;
@@ -325,12 +318,10 @@
                     total += parseInt(card);
                 }
             }
-
             while (total > 21 && aces > 0) {
                 total -= 10;
                 aces--;
             }
-
             return total;
         };
 
@@ -350,24 +341,20 @@
         const endGame = () => {
             document.getElementById("hit-btn").disabled = true;
             document.getElementById("stand-btn").disabled = true;
-
             revealDealerCards();
-
             let result;
             if (playerTotal > 21) {
                 result = `Bust! You lost $${currentBet}.`;
             } else if (dealerTotal > 21 || playerTotal > dealerTotal) {
                 result = `You win $${currentBet}!`;
-                balance += currentBet * 2; 
+                balance += currentBet * 2;
             } else if (playerTotal === dealerTotal) {
                 result = "It's a tie!";
-                balance += currentBet; 
+                balance += currentBet;
             } else {
                 result = `Dealer wins! You lost $${currentBet}.`;
             }
-
             showPopup(result);
-
             document.getElementById("balance").innerText = `Balance: $${balance}`;
             currentBet = 0;
             document.getElementById("current-bet").innerText = `Current Bet: $0`;
@@ -388,7 +375,6 @@
             const popup = document.getElementById("result-popup");
             popup.innerText = message;
             popup.classList.add("show");
-
             setTimeout(() => {
                 popup.classList.remove("show");
             }, 3000);
