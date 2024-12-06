@@ -191,15 +191,12 @@
         <p id="balance">Balance: $1000</p>
     </div>
 
-    <div class="controls">
-        <button class="color-btn" onclick="changeTableColor('#5e3d26', '#8b4513')">Default Brown</button>
-        <button class="color-btn" onclick="changeTableColor('#1c2833', '#34495e')">Cool Blue</button>
-        <button class="color-btn" onclick="changeTableColor('#641e16', '#922b21')">Bold Red</button>
-    </div>
-
     <button class="refill-btn" onclick="refillBalance()">Refill Balance</button>
 
     <div class="popup" id="result-popup"></div>
+
+    <!-- Add the audio for the card passing sound -->
+    <audio id="card-sound" src="card-sound.mp3"></audio>
 
     <script>
         let playerCards = [];
@@ -262,6 +259,10 @@
         };
 
         const hit = () => {
+            const cardSound = document.getElementById("card-sound");
+            cardSound.currentTime = 0; // Restart the sound if it's already playing
+            cardSound.play();
+
             playerCards.push(drawCard());
             playerTotal = calculateTotal(playerCards);
             updateCards("player-cards", playerCards);
