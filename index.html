@@ -109,7 +109,7 @@
             margin-top: 10px;
         }
 
-        .control-btn, .color-btn {
+        .control-btn {
             background: #e74c3c;
             color: white;
             border: none;
@@ -124,7 +124,7 @@
             background: #c0392b;
         }
 
-        .refill-btn {
+        .refill-btn, .color-btn {
             background: #3498db;
             color: white;
             border: none;
@@ -135,16 +135,8 @@
             cursor: pointer;
         }
 
-        .refill-btn:hover {
+        .refill-btn:hover, .color-btn:hover {
             background: #2980b9;
-        }
-
-        .color-btn {
-            background: #34495e;
-        }
-
-        .color-btn:hover {
-            background: #2c3e50;
         }
 
         .popup {
@@ -197,18 +189,17 @@
         <button class="control-btn" id="hit-btn" onclick="hit()" disabled>Hit</button>
         <button class="control-btn" id="stand-btn" onclick="stand()" disabled>Stand</button>
         <p id="balance">Balance: $1000</p>
-        <button class="refill-btn" onclick="refillBalance()">Refill Balance</button>
     </div>
 
     <div class="controls">
-        <button class="color-btn" onclick="changeTableColor('#5e3d26', '#8b4513')">Brown</button>
-        <button class="color-btn" onclick="changeTableColor('#34495e', '#2c3e50')">Cool Blue</button>
-        <button class="color-btn" onclick="changeTableColor('#e74c3c', '#c0392b')">Red</button>
+        <button class="color-btn" onclick="changeTableColor('#5e3d26', '#8b4513')">Default Brown</button>
+        <button class="color-btn" onclick="changeTableColor('#1c2833', '#34495e')">Cool Blue</button>
+        <button class="color-btn" onclick="changeTableColor('#641e16', '#922b21')">Bold Red</button>
     </div>
 
-    <div class="popup" id="result-popup"></div>
+    <button class="refill-btn" onclick="refillBalance()">Refill Balance</button>
 
-    <audio id="card-sound" src="card-sound.mp3"></audio>
+    <div class="popup" id="result-popup"></div>
 
     <script>
         let playerCards = [];
@@ -271,10 +262,6 @@
         };
 
         const hit = () => {
-            const cardSound = document.getElementById("card-sound");
-            cardSound.currentTime = 0; 
-            cardSound.play();
-
             playerCards.push(drawCard());
             playerTotal = calculateTotal(playerCards);
             updateCards("player-cards", playerCards);
@@ -347,14 +334,16 @@
             let result;
             if (playerTotal > 21) {
                 result = `Bust! You lost $${currentBet}.`;
+                // Balance stays unchanged
             } else if (dealerTotal > 21 || playerTotal > dealerTotal) {
                 result = `You win $${currentBet}!`;
-                balance += currentBet * 2; 
+                balance += currentBet * 2; // Add winnings
             } else if (playerTotal === dealerTotal) {
                 result = "It's a tie!";
-                balance += currentBet; 
+                balance += currentBet; // Refund bet
             } else {
                 result = `Dealer wins! You lost $${currentBet}.`;
+                // Balance stays unchanged
             }
 
             showPopup(result);
