@@ -34,11 +34,11 @@
             width: 90%;
             height: 500px;
             border-radius: 20px;
-            border: 15px solid #8b4513; /* Default brown outline */
+            border: 15px solid #8b4513;
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
             position: relative;
             margin-top: 20px;
-            background-color: #5e3d26; /* Default brown base */
+            background-color: #5e3d26;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -331,17 +331,19 @@
 
             revealDealerCards();
 
-            const result =
-                playerTotal > 21
-                    ? `Bust! You lost $${currentBet}.`
-                    : dealerTotal > 21 || playerTotal > dealerTotal
-                    ? `You win $${currentBet}!`
-                    : playerTotal === dealerTotal
-                    ? "It's a tie!"
-                    : `Dealer wins! You lost $${currentBet}.`;
-
-            if (result.includes("win")) {
-                balance += currentBet * 2;
+            let result;
+            if (playerTotal > 21) {
+                result = `Bust! You lost $${currentBet}.`;
+                // Balance stays unchanged
+            } else if (dealerTotal > 21 || playerTotal > dealerTotal) {
+                result = `You win $${currentBet}!`;
+                balance += currentBet * 2; // Add winnings
+            } else if (playerTotal === dealerTotal) {
+                result = "It's a tie!";
+                balance += currentBet; // Refund bet
+            } else {
+                result = `Dealer wins! You lost $${currentBet}.`;
+                // Balance stays unchanged
             }
 
             showPopup(result);
