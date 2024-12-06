@@ -39,30 +39,30 @@
             position: relative;
             margin-top: 20px;
             background-color: #5e3d26; /* Default brown base */
-        }
-
-        .table .text {
-            color: gold;
-            text-align: center;
-            font-size: 20px;
-            margin-top: 10px;
-        }
-
-        .dealer-area, .player-area {
             display: flex;
-            justify-content: center;
-            margin: 20px;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dealer-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 10px;
         }
 
         .player-area {
-            margin-top: 100px; /* Move player cards lower */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 10px;
         }
 
-        .player-area-label {
+        .hand-value {
             color: white;
-            text-align: center;
             font-size: 18px;
-            margin-top: 10px;
+            margin: 5px 0;
         }
 
         .card {
@@ -169,11 +169,14 @@
     </header>
 
     <div class="table" id="table">
-        <div class="text">Blackjack Pays 3 to 2 • Dealer Must Stand on 17</div>
-
-        <div class="dealer-area" id="dealer-cards"></div>
-        <div class="player-area" id="player-cards"></div>
-        <div class="player-area-label">Your Hand</div>
+        <div class="dealer-area">
+            <div class="hand-value" id="dealer-value">Dealer's Hand: ?</div>
+            <div id="dealer-cards"></div>
+        </div>
+        <div class="player-area">
+            <div id="player-cards"></div>
+            <div class="hand-value" id="player-value">Your Hand: ?</div>
+        </div>
     </div>
 
     <div class="chips-area">
@@ -244,6 +247,8 @@
                 <div class="card">?</div>
                 <div class="card">?</div>
             `;
+            document.getElementById("dealer-value").innerText = "Dealer's Hand: ?";
+            document.getElementById("player-value").innerText = "Your Hand: ?";
         };
 
         const dealInitialCards = () => {
@@ -253,12 +258,14 @@
             dealerTotal = calculateTotal([dealerCards[0]]);
             updateCards("player-cards", playerCards);
             updateCards("dealer-cards", ["?", dealerCards[1]]);
+            document.getElementById("player-value").innerText = `Your Hand: ${playerTotal}`;
         };
 
         const hit = () => {
             playerCards.push(drawCard());
             playerTotal = calculateTotal(playerCards);
             updateCards("player-cards", playerCards);
+            document.getElementById("player-value").innerText = `Your Hand: ${playerTotal}`;
 
             if (playerTotal >= 21) {
                 endGame();
@@ -268,12 +275,12 @@
         const stand = () => {
             revealDealerCards();
 
-            // Dealer draws cards until the total is at least 17 and not above 21
             while (dealerTotal < 17) {
                 dealerCards.push(drawCard());
                 dealerTotal = calculateTotal(dealerCards);
             }
 
+            document.getElementById("dealer-value").innerText = `Dealer's Hand: ${dealerTotal}`;
             endGame();
         };
 
@@ -314,6 +321,8 @@
 
         const revealDealerCards = () => {
             updateCards("dealer-cards", dealerCards);
+            dealerTotal = calculateTotal(dealerCards);
+            document.getElementById("dealer-value").innerText = `Dealer's Hand: ${dealerTotal}`;
         };
 
         const endGame = () => {
@@ -332,7 +341,7 @@
                     : `Dealer wins! You lost $${currentBet}.`;
 
             if (result.includes("win")) {
-                balance += currentBet * 2; // Add winnings for a win
+                balance += currentBet * 2;
             }
 
             showPopup(result);
@@ -360,7 +369,7 @@
 
             setTimeout(() => {
                 popup.classList.remove("show");
-            }, 3000); // Hide the popup after 3 seconds
+            }, 3000);
         };
     </script>
 </body>
