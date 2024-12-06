@@ -45,18 +45,10 @@
             align-items: center;
         }
 
-        .dealer-area {
+        .dealer-area, .player-area {
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-top: 10px;
-        }
-
-        .player-area {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-bottom: 10px;
         }
 
         .hand-value {
@@ -77,6 +69,14 @@
             text-align: center;
             line-height: 90px;
             font-size: 18px;
+            transform: translateY(-20px);
+            opacity: 0;
+            transition: transform 0.5s ease, opacity 0.5s ease;
+        }
+
+        .card.fly-in {
+            transform: translateY(0);
+            opacity: 1;
         }
 
         .chips-area {
@@ -124,7 +124,7 @@
             background: #c0392b;
         }
 
-        .refill-btn, .color-btn {
+        .refill-btn {
             background: #3498db;
             color: white;
             border: none;
@@ -135,31 +135,8 @@
             cursor: pointer;
         }
 
-        .refill-btn:hover, .color-btn:hover {
+        .refill-btn:hover {
             background: #2980b9;
-        }
-
-        .popup {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 20px 40px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-            text-align: center;
-            font-size: 24px;
-            z-index: 1000;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.5s ease-in-out;
-        }
-
-        .popup.show {
-            opacity: 1;
-            pointer-events: auto;
         }
     </style>
 </head>
@@ -188,18 +165,12 @@
         <button class="control-btn" id="place-bet-btn" onclick="placeBet()" disabled>Place Bet</button>
         <button class="control-btn" id="hit-btn" onclick="hit()" disabled>Hit</button>
         <button class="control-btn" id="stand-btn" onclick="stand()" disabled>Stand</button>
+        <button class="control-btn" id="double-down-btn" onclick="doubleDown()" disabled>Double Down</button>
+        <button class="control-btn" id="split-btn" onclick="split()" disabled>Split</button>
         <p id="balance">Balance: $1000</p>
     </div>
 
-    <div class="controls">
-        <button class="color-btn" onclick="changeTableColor('#5e3d26', '#8b4513')">Default Brown</button>
-        <button class="color-btn" onclick="changeTableColor('#1c2833', '#34495e')">Cool Blue</button>
-        <button class="color-btn" onclick="changeTableColor('#641e16', '#922b21')">Bold Red</button>
-    </div>
-
     <button class="refill-btn" onclick="refillBalance()">Refill Balance</button>
-
-    <div class="popup" id="result-popup"></div>
 
     <script>
         let playerCards = [];
@@ -208,6 +179,7 @@
         let dealerTotal = 0;
         let balance = 1000;
         let currentBet = 0;
+        let playerSplit = false;
 
         const setBet = (amount) => {
             if (currentBet + amount > balance) {
@@ -235,6 +207,8 @@
             dealInitialCards();
             document.getElementById("hit-btn").disabled = false;
             document.getElementById("stand-btn").disabled = false;
+            document.getElementById("double-down-btn").disabled = false;
+            checkForSplit();
         };
 
         const resetGame = () => {
@@ -242,10 +216,11 @@
             dealerCards = [];
             playerTotal = 0;
             dealerTotal = 0;
+            playerSplit = false;
             document.getElementById("player-cards").innerHTML = "";
             document.getElementById("dealer-cards").innerHTML = `
-                <div class="card">?</div>
-                <div class="card">?</div>
+                <div class="card fly-in">?</div>
+                <div class="card fly-in">?</div>
             `;
             document.getElementById("dealer-value").innerText = "Dealer's Hand: ?";
             document.getElementById("player-value").innerText = "Your Hand: ?";
@@ -266,22 +241,46 @@
             playerTotal = calculateTotal(playerCards);
             updateCards("player-cards", playerCards);
             document.getElementById("player-value").innerText = `Your Hand: ${playerTotal}`;
-
             if (playerTotal >= 21) {
                 endGame();
             }
         };
 
         const stand = () => {
-            revealDealerCards();
-
-            while (dealerTotal < 17) {
-                dealerCards.push(drawCard());
-                dealerTotal = calculateTotal(dealerCards);
-            }
-
-            document.getElementById("dealer-value").innerText = `Dealer's Hand: ${dealerTotal}`;
+            dealerPlay();
             endGame();
+        };
+
+        const doubleDown = () => {
+            if (currentBet * 2 > balance) {
+                alert("Not enough balance for Double Down!");
+                return;
+            }
+            balance -= currentBet;
+            currentBet *= 2;
+            document.getElementById("balance").innerText = `Balance: $${balance}`;
+            playerCards.push(drawCard());
+            playerTotal = calculateTotal(playerCards);
+            updateCards("player-cards", playerCards);
+            document.getElementById("player-value").innerText = `Your Hand: ${playerTotal}`;
+            stand();
+        };
+
+        const checkForSplit = () => {
+            if (playerCards.length === 2 && playerCards[0] === playerCards[1]) {
+                document.getElementById("split-btn").disabled = false;
+            }
+        };
+
+        const split = () => {
+            if (currentBet * 2 > balance) {
+                alert("Not enough balance to Split!");
+                return;
+            }
+            balance -= currentBet;
+            document.getElementById("balance").innerText = `Balance: $${balance}`;
+            playerSplit = true;
+            // Logic for splitting and managing two hands can be added here
         };
 
         const drawCard = () => {
@@ -292,7 +291,6 @@
         const calculateTotal = (cards) => {
             let total = 0;
             let aces = 0;
-
             for (let card of cards) {
                 if (card === "A") {
                     total += 11;
@@ -303,75 +301,38 @@
                     total += parseInt(card);
                 }
             }
-
             while (total > 21 && aces > 0) {
                 total -= 10;
                 aces--;
             }
-
             return total;
         };
 
         const updateCards = (areaId, cards) => {
             const area = document.getElementById(areaId);
             area.innerHTML = cards
-                .map((card) => `<div class="card">${card === "?" ? "?" : card}</div>`)
+                .map((card) => `<div class="card fly-in">${card === "?" ? "?" : card}</div>`)
                 .join("");
         };
 
-        const revealDealerCards = () => {
-            updateCards("dealer-cards", dealerCards);
-            dealerTotal = calculateTotal(dealerCards);
-            document.getElementById("dealer-value").innerText = `Dealer's Hand: ${dealerTotal}`;
+        const dealerPlay = () => {
+            while (dealerTotal < 17) {
+                dealerCards.push(drawCard());
+                dealerTotal = calculateTotal(dealerCards);
+            }
         };
 
         const endGame = () => {
             document.getElementById("hit-btn").disabled = true;
             document.getElementById("stand-btn").disabled = true;
-
-            revealDealerCards();
-
-            let result;
-            if (playerTotal > 21) {
-                result = `Bust! You lost $${currentBet}.`;
-                // Balance stays unchanged
-            } else if (dealerTotal > 21 || playerTotal > dealerTotal) {
-                result = `You win $${currentBet}!`;
-                balance += currentBet * 2; // Add winnings
-            } else if (playerTotal === dealerTotal) {
-                result = "It's a tie!";
-                balance += currentBet; // Refund bet
-            } else {
-                result = `Dealer wins! You lost $${currentBet}.`;
-                // Balance stays unchanged
-            }
-
-            showPopup(result);
-
-            document.getElementById("balance").innerText = `Balance: $${balance}`;
-            currentBet = 0;
-            document.getElementById("current-bet").innerText = `Current Bet: $0`;
+            document.getElementById("double-down-btn").disabled = true;
+            document.getElementById("split-btn").disabled = true;
+            dealerPlay();
         };
 
         const refillBalance = () => {
             balance = 1000;
             document.getElementById("balance").innerText = `Balance: $${balance}`;
-        };
-
-        const changeTableColor = (baseColor, borderColor) => {
-            const table = document.getElementById("table");
-            table.style.backgroundColor = baseColor;
-            table.style.borderColor = borderColor;
-        };
-
-        const showPopup = (message) => {
-            const popup = document.getElementById("result-popup");
-            popup.innerText = message;
-            popup.classList.add("show");
-
-            setTimeout(() => {
-                popup.classList.remove("show");
-            }, 3000);
         };
     </script>
 </body>
